@@ -1,19 +1,38 @@
+import { useMemo } from "react"
 import BudgetForm from "./components/BudgetForm"
+import { useBudget } from "./hooks/useBudget"
+import BudgetTracker from "./components/BudgetTracker"
+import ExpenseModal from "./components/ExpenseModal"
 
 function App() {
+  const { state } = useBudget()
+
+  const isValidBudget = useMemo(() => {
+    return state.budget > 0
+  }, [state.budget])
 
 
   return (
     <>
-      <header className="bg-sky-600 py-8 max-h-72">
-        <h1 className="uppercase text-center font-black text-4xl text-white italic">
+      <header className="flex items-center justify-center gap-4 py-8 bg-sky-600 max-h-72">
+        <img src="/public/wallet-icon.svg" className="h-[50px] hover:scale-110 hover:rotate-[360deg] transition" />
+        <h1 className="text-4xl italic font-black text-center text-white uppercase ">
           Expenses Planner
         </h1>
       </header>
 
-      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-10">
-        <BudgetForm />
+      <div className="max-w-3xl p-10 mx-auto mt-10 bg-white rounded-lg shadow-lg">
+        {isValidBudget ? <BudgetTracker />  : (
+          <BudgetForm />
+        )}
+
       </div>
+
+        {isValidBudget && (
+          <main  className="max-w-3xl py-10 mx-auto">
+            <ExpenseModal/>
+          </main>
+        )}
     </>
   )
 }
