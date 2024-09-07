@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { categories } from "../data/categories";
 import DatePicker from 'react-date-picker';
 import 'react-date-picker/dist/DatePicker.css';
@@ -16,7 +16,15 @@ export default function ExpenseForm() {
         date: new Date()
     })
     const [error, setError ] = useState('')
-    const { dispatch } = useBudget()
+    const { state, dispatch } = useBudget()
+
+    // charge editing expense in form
+    useEffect(() => {
+        if(state.editingId) {
+            const editingExpense = state.expenses.filter( exp => exp.id === state.editingId)[0]
+            setExpense(editingExpense)
+        }
+    }, [state.editingId])
 
     const handleChange = (
       e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
@@ -50,6 +58,7 @@ export default function ExpenseForm() {
         } 
 
         // Add new Expense and close modal
+        state.editingId ? dispatch({type: 'update-expense', payload: {expense: {...expense, id: state.editingId}}}) :
         dispatch({type: 'add-expense', payload: {expense}})
 
         // reset form 
@@ -64,9 +73,10 @@ export default function ExpenseForm() {
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
         <legend
-            className="py-2 text-2xl font-bold text-center uppercase border-b-2 border-sky-500"
+            className={`py-2 text-2xl font-bold text-center uppercase border-b-2 ${state.editingId ? 'border-yellow-500' : 'border-sky-500'}`}
         >
-            New Expense
+            {state.editingId ? 'Editing Expense' : 'New Expense'}
+            
         </legend>
 
         
@@ -149,8 +159,8 @@ export default function ExpenseForm() {
 
         <input 
             type="submit" 
-            className="w-full p-2 font-bold text-white uppercase transition border-2 cursor-pointer bg-sky-600 rounded-2xl border-sky-600 hover:bg-sky-400"
-            value={'Save Expense'}
+            className={`w-full p-2 font-bold text-white uppercase transition border-2 cursor-pointer rounded-2xl ${state.editingId ? 'bg-yellow-600  border-yellow-600 hover:bg-yellow-400' : 'bg-sky-600  border-sky-600 hover:bg-sky-400'}`}
+            value={state.editingId ? 'Save changes' : 'Save Expense'}
         />
         
     </form>
