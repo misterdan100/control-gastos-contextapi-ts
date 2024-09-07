@@ -49,9 +49,16 @@ export default function ExpenseForm() {
             return
         } 
 
-        // Add new Expense
+        // Add new Expense and close modal
         dispatch({type: 'add-expense', payload: {expense}})
-        
+
+        // reset form 
+        setExpense({
+            amount: 0,
+            expenseName: '',
+            category: '',
+            date: new Date()
+        })        
     }
 
   return (

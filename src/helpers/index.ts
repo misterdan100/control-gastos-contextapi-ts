@@ -14,3 +14,14 @@ export const formatData = (date: string) => {
 
 // input: '2024-09-05'
 // output: '04/09/2024'
+
+export function formatDateV2(dateStr: string): string {
+    const dateObj = new Date(dateStr)
+    const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    }
+    return new Intl.DateTimeFormat('en-US', options).format(dateObj)
+}
