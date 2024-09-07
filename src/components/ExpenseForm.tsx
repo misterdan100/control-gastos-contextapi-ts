@@ -16,13 +16,15 @@ export default function ExpenseForm() {
         date: new Date()
     })
     const [error, setError ] = useState('')
-    const { state, dispatch } = useBudget()
+    const [previousAmount, setPreviousAmount] = useState(0)
+    const { state, dispatch, remainingBudget } = useBudget()
 
     // charge editing expense in form
     useEffect(() => {
         if(state.editingId) {
             const editingExpense = state.expenses.filter( exp => exp.id === state.editingId)[0]
             setExpense(editingExpense)
+            setPreviousAmount(editingExpense.amount)
         }
     }, [state.editingId])
 
@@ -57,6 +59,13 @@ export default function ExpenseForm() {
             return
         } 
 
+        // Validate dont exceed the budget
+        if((expense.amount - previousAmount) > remainingBudget) {
+            const exceed = expense.amount - remainingBudget
+            setError(`That expense exceeds the budget in ${exceed}!`)
+            return
+        }
+
         // Add new Expense and close modal
         state.editingId ? dispatch({type: 'update-expense', payload: {expense: {...expense, id: state.editingId}}}) :
         dispatch({type: 'add-expense', payload: {expense}})
@@ -67,7 +76,8 @@ export default function ExpenseForm() {
             expenseName: '',
             category: '',
             date: new Date()
-        })        
+        })    
+        setPreviousAmount(0)    
     }
 
   return (
